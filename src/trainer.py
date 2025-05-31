@@ -396,7 +396,7 @@ class GFNTrainer:
             proxy = ModelProxy(model, num_workers)
         elif training_method == "db":
             self.model.add_state_flow()
-            self.sampling_model = deepcopy(self.model)
+            self.target_model = deepcopy(self.model)
             proxy = ModelProxy(self.model, num_workers)
         else:
             raise ValueError()
@@ -526,7 +526,7 @@ class GFNTrainer:
 
         # compute backward flow
         with torch.no_grad():
-            _, _, bck_log_flow = self.sampling_model(
+            _, _, bck_log_flow = self.target_model(
                 batch.next_batch,
                 return_backward_dist=not self.unif_backward,
                 return_flow=True,
@@ -558,8 +558,8 @@ class GFNTrainer:
         max_iters = self.iter_num + iters
         self.model.train()
         self.model.to(device)
-        if self.sampling_model:
-            self.sampling_model.to(device)
+        if self.target_model:
+            self.target_model.to(device)
 
         self.trigger_callbacks("on_train_start")
         self.iter_time = self.iter_start = time.time()
@@ -581,8 +581,8 @@ class GFNTrainer:
             if self.scheduler is not None:
                 self.scheduler.step()
 
-            if self.sampling_model:
-                self.update_sampling_model()
+            if self.target_model:
+                self.update_target_model()
 
             self.iter_num += 1
             tnow = time.time()

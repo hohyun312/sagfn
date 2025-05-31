@@ -79,10 +79,6 @@ if __name__ == "__main__":
                 get_model_save_callback(save_dir, "model", save_every=conf.save_every),
             )
 
-        trainer.add_callback(
-            "on_batch_end", get_break_callback(save_dir, name="ckpt", time_limit=712)
-        )
-
         ckpt_path = os.path.join(save_dir, "final.pt")
         max_iters = conf.num_iters
         if os.path.exists(ckpt_path):
@@ -95,5 +91,5 @@ if __name__ == "__main__":
         trainer.save(ckpt_path)
         print('Save:', ckpt_path)
     else:
-        print("Usage: python main.py <config_path> <seed> <save_dir>")
+        print("Usage: python main.py <config_path> <seed> <logging_path>")
         sys.exit(1)
